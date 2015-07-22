@@ -30,7 +30,7 @@ assert(isequal( size(imgmtx),[frame_height*frame_number,frame_width] ));
 for iFrame = 1:frame_number
     frameThis = imgmtx((iFrame-1)*frame_height+1:iFrame*frame_height,:);
     clf;
-    imagesc(frameThis,[128, 255]); colormap gray;
+    imagesc(frameThis,[128, 255]); colormap gray; axis image;
     title(sprintf('frame %d', iFrame));
     pause;
 end

@@ -18,7 +18,7 @@ classdef ToolboxTest < matlab.unittest.TestCase
     
     methods (TestClassSetup)
         function addFoldersToPath(testCase)
-            testCase.addTeardown(@path, path); % basically, because path function returns the current path.
+            % testCase.addTeardown(@path, path); % basically, because path function returns the current path.
             % so this is equivalent to.
             % tmp = path; % before all tests.
             % path(tmp); % after all tests.
@@ -140,6 +140,37 @@ classdef ToolboxTest < matlab.unittest.TestCase
                 end
             end
             testCase.assertEqual(counter,98); % number of images in the set.
+        end
+        
+        function testMoviePermute(testCase)
+            % test movie permutation.
+            numberOfCases = 1000;
+            for iCase = 1:numberOfCases
+                imageHeight = randi([100,200]);
+                imageWidth = randi([100,200]);
+                frameNumber = randi([1,5]);
+                Pfwd = randperm(frameNumber);
+                Pback = zeros(frameNumber,1);
+                Pback(Pfwd) = 1:frameNumber;
+                
+                %disp(frameNumber);
+                %% generate old movie
+                imgmtx = randi([0,255],imageHeight*frameNumber,imageWidth);
+                dmns = [8, imageWidth, imageHeight, frameNumber];
+                notes = '';
+                ctx_matlab_toolbox.savecx('old.ctx',notes,dmns,imgmtx);
+                % try permute.
+                ctx_matlab_toolbox.savecx_movie_permute('old.ctx','new.ctx',Pfwd);
+                % try premute back.
+                ctx_matlab_toolbox.savecx_movie_permute('new.ctx','new.ctx',Pback);
+                % test that permuted back version is the same as the
+                % original one.
+                imgmtx_new = ctx_matlab_toolbox.loadcx('new.ctx');
+                
+                testCase.assertEqual(imgmtx_new,imgmtx);
+                delete('new.ctx');
+                delete('old.ctx');
+            end
         end
     end
     
